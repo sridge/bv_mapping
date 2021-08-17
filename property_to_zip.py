@@ -4,6 +4,10 @@ import pandas as pd
 from tqdm import tqdm
 from sqlalchemy import create_engine
 
+"""
+Script to bin properties to zipcodes. Iterates through zipcodes one by one. Could go faster but don't want to
+use too many of the database's CPUs
+"""
 
 user = os.environ.get("PRE_DB_USER")
 host = os.environ.get("PRE_DB_HOST")
@@ -15,11 +19,11 @@ print("reading")
 df = pd.read_csv("/Users/sean/Desktop/zipcodes.csv")
 filenames = glob("./data/*.csv")
 gids = [filename.split("_")[0][7:] for filename in filenames]
-print("----------------------")
+print("------------ all properties ------------")
 print(len(df["gid"]))
-print("----------------------")
+print("-------- unprocessed properties --------")
 print(len(df["gid"][~df["gid"].isin(gids)]))
-print("----------------------")
+print("----------------------------------------")
 
 
 for gid in tqdm(df["gid"][~df["gid"].isin(gids)]):
