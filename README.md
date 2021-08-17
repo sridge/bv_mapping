@@ -1,5 +1,5 @@
 # bv_mapping
-1. `conda install dask tqdm`
+1. Add these to the betterview environment: `conda install dask tqdm`
 2. `mkdir data`
 3. `mkdir zipcodes`
 4. download zipcode shapes from: https://drive.google.com/drive/folders/1nHB9hMFcRdyUOKpaK1h83uGvSHK8ewPo?usp=sharing
