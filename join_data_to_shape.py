@@ -30,38 +30,40 @@ def insert_data_into_json(row):
     return row
 
 
-for zipcode_region in range(0, 10):
+if __name__ == "__main__":
 
-    print("----------------")
-    print(f"creating geojson for zipcode region {zipcode_region}")
-    print("----------------")
+    for zipcode_region in range(0, 10):
 
-    # load data from every single zipcode in that region
-    df = dd.read_csv(f"./data/*_{zipcode_region}*.csv").compute()
+        print("----------------")
+        print(f"creating geojson for zipcode region {zipcode_region}")
+        print("----------------")
 
-    # load shapes for a single zipcode region
-    df_shape = pd.read_csv(f"./zipcodes/zipcode_shape_{zipcode_region}.csv")
+        # load data from every single zipcode in that region
+        df = dd.read_csv(f"./data/*_{zipcode_region}*.csv").compute()
 
-    # join to that region and save intermediate result
-    df = df.join(df_shape.set_index("gid"), on="gid")
-    df = df.dropna()
-    df = df.set_index("gid")
-    df.to_parquet(f"joined_{zipcode_region}")
+        # load shapes for a single zipcode region
+        df_shape = pd.read_csv(f"./zipcodes/zipcode_shape_{zipcode_region}.csv")
 
-    # reformat to geojson and save intermediate result
-    df = pd.read_parquet(f"joined_{zipcode_region}")
-    df = df.apply(insert_data_into_json, axis=1)
-    df.to_parquet(f"converted_{zipcode_region}")
+        # join to that region and save intermediate result
+        df = df.join(df_shape.set_index("gid"), on="gid")
+        df = df.dropna()
+        df = df.set_index("gid")
+        df.to_parquet(f"joined_{zipcode_region}")
 
-    # save as geojson for that zipcode region
-    df = pd.read_parquet(f"converted_{zipcode_region}")
-    df["st_asgeojson"].to_json(f"zipcode_region_{zipcode_region}.json", orient="values")
+        # reformat to geojson and save intermediate result
+        df = pd.read_parquet(f"joined_{zipcode_region}")
+        df = df.apply(insert_data_into_json, axis=1)
+        df.to_parquet(f"converted_{zipcode_region}")
 
-    prefix = '{"type": "FeatureCollection", "features": '
-    suffix = "}"
+        # save as geojson for that zipcode region
+        df = pd.read_parquet(f"converted_{zipcode_region}")
+        df["st_asgeojson"].to_json(f"zipcode_region_{zipcode_region}.json", orient="values")
 
-    with open(f"zipcode_region_{zipcode_region}.json", "r") as f:
-        read_data = f.read()
-    with open(f"zipcode_region_{zipcode_region}.json", "w") as f:
-        write_data = prefix + read_data + suffix
-        f.write(write_data)
+        prefix = '{"type": "FeatureCollection", "features": '
+        suffix = "}"
+
+        with open(f"zipcode_region_{zipcode_region}.json", "r") as f:
+            read_data = f.read()
+        with open(f"zipcode_region_{zipcode_region}.json", "w") as f:
+            write_data = prefix + read_data + suffix
+            f.write(write_data)
