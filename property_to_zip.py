@@ -18,7 +18,7 @@ engine = create_engine(f"postgresql://{user}@{host}:{pw}@{host}/{db_name}")
 print("reading")
 df = pd.read_csv("/Users/sean/Desktop/zipcodes.csv")
 filenames = glob("./data/*.csv")
-gids = [filename.split("_")[0][7:] for filename in filenames]
+gids = [int(filename.split("_")[0][7:]) for filename in filenames]
 print("------------ all properties ------------")
 print(len(df["gid"]))
 print("-------- unprocessed properties --------")
